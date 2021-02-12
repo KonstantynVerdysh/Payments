@@ -2,6 +2,7 @@ package ua.com.verdysh.payments.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,23 +12,30 @@ import java.util.Collection;
 public class Account implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(Views.CustomerAccounts.class)
     private Long accountId;
-    @JsonProperty("account_num")
+
     @Column(unique = true, length = 16)
+    @JsonView(Views.CustomerAccounts.class)
     private String accountNum;
-    @JsonProperty("account_type")
+
     @Column(nullable = false)
+    @JsonView(Views.CustomerAccounts.class)
     private String accountType;
-    @JsonProperty("balance")
+
     @Column(nullable = false)
+    @JsonView(Views.CustomerAccounts.class)
     private Double balance;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "customer_id")
     @JsonBackReference
     private Customer customer;
+
     @OneToMany(mappedBy = "payer", cascade = CascadeType.ALL)
     private Collection<Payment> outPayments;
+
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
     private Collection<Payment> inPayments;
 
@@ -43,6 +51,7 @@ public class Account implements Serializable {
         return accountId;
     }
 
+    @JsonProperty("account_id")
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
     }
@@ -51,6 +60,7 @@ public class Account implements Serializable {
         return accountNum;
     }
 
+    @JsonProperty("account_num")
     public void setAccountNum(String accountNum) {
         this.accountNum = accountNum;
     }
@@ -59,6 +69,7 @@ public class Account implements Serializable {
         return accountType;
     }
 
+    @JsonProperty("account_type")
     public void setAccountType(String accountType) {
         this.accountType = accountType;
     }
@@ -67,6 +78,7 @@ public class Account implements Serializable {
         return balance;
     }
 
+    @JsonProperty("balance")
     public void setBalance(Double balance) {
         this.balance = balance;
     }
@@ -83,6 +95,7 @@ public class Account implements Serializable {
         return outPayments;
     }
 
+    @JsonProperty("sended_payments")
     public void setOutPayments(Collection<Payment> outPayments) {
         this.outPayments = outPayments;
     }
@@ -91,6 +104,7 @@ public class Account implements Serializable {
         return inPayments;
     }
 
+    @JsonProperty("recieved_payments")
     public void setInPayments(Collection<Payment> inPayments) {
         this.inPayments = inPayments;
     }

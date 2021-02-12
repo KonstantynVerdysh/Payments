@@ -1,7 +1,6 @@
 package ua.com.verdysh.payments.domain;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,28 +10,28 @@ import java.util.Collection;
 public class Customer implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView({Views.CustomerWithOnlyId.class, Views.CustomerAccounts.class})
     private Long customerId;
-    @JsonProperty("first_name")
+
     @Column(nullable = false)
     private String firstName;
-    @JsonProperty("last_name")
+
     @Column(nullable = false)
     private String lastName;
+
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     @JsonManagedReference
     private Collection<Account> accounts;
 
-    public Customer() { super(); }
+    public Customer() { }
 
     public Customer(String firstName, String lastName) {
-        super();
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
     public Customer(String firstName, String lastName, Collection<Account> accounts) {
-        super();
         this.firstName = firstName;
         this.lastName = lastName;
         this.accounts = accounts;
@@ -42,6 +41,7 @@ public class Customer implements Serializable {
         return customerId;
     }
 
+    @JsonProperty("customer_id")
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
@@ -50,6 +50,7 @@ public class Customer implements Serializable {
         return firstName;
     }
 
+    @JsonProperty("first_name")
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -58,6 +59,7 @@ public class Customer implements Serializable {
         return lastName;
     }
 
+    @JsonProperty("last_name")
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
@@ -66,6 +68,7 @@ public class Customer implements Serializable {
         return accounts;
     }
 
+    @JsonProperty("accounts")
     public void setAccounts(Collection<Account> accounts) {
         this.accounts = accounts;
     }

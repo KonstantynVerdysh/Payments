@@ -1,31 +1,46 @@
 package ua.com.verdysh.payments.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 public class Payment implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView({Views.PaymentWithIdAndStatus.class, Views.PaymentWithOnlyId.class})
     private Long paymentId;
+
     @Column(nullable = false)
-    private Date timestamp;
+    private final LocalDateTime timestamp = LocalDateTime.now();
+
     @Column(nullable = false)
     private Double amount;
+
     private String reason;
+
     @ManyToOne
     @JoinColumn(name = "payer_id")
+    @JsonIgnore
     private Account payer;
+
     @ManyToOne
     @JoinColumn(name = "recipient_id")
+    @JsonIgnore
     private Account recipient;
 
-    public Payment() { super(); }
+//    @Transient
+    @JsonView(Views.PaymentWithIdAndStatus.class)
+    private String status;
 
-    public Payment(Date timestamp, Double amount, String reason, Account payer, Account recipient) {
-        this.timestamp = timestamp;
+    public Payment() { }
+
+    public Payment(Account payer, Account recipient, Double amount, String reason) {
         this.amount = amount;
         this.reason = reason;
         this.payer = payer;
@@ -36,22 +51,21 @@ public class Payment implements Serializable {
         return paymentId;
     }
 
+    @JsonProperty("payment_id")
     public void setPaymentId(Long paymentId) {
         this.paymentId = paymentId;
     }
 
-    public Date getTimestamp() {
+    @JsonProperty("timestamp")
+    public LocalDateTime getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
     }
 
     public Double getAmount() {
         return amount;
     }
 
+    @JsonProperty("amount")
     public void setAmount(Double amount) {
         this.amount = amount;
     }
@@ -60,6 +74,7 @@ public class Payment implements Serializable {
         return reason;
     }
 
+    @JsonProperty("reason")
     public void setReason(String reason) {
         this.reason = reason;
     }
@@ -78,5 +93,14 @@ public class Payment implements Serializable {
 
     public void setRecipient(Account recipient) {
         this.recipient = recipient;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    @JsonProperty("status")
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
